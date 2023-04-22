@@ -1,0 +1,33 @@
+---
+kind: pipeline
+name: default
+
+platform:
+    os: linux
+    arch: amd64
+
+steps:
+    - name: unit test
+      image: golang
+      failure: ignore
+      commands:
+          - go test ./...
+
+    - name: sonar-scanner
+      image: aosapps/drone-sonar-plugin:1.1
+      settings:
+          sonar_host:
+              from_secret: sonar_host
+          sonar_token:
+              from_secret: sonar_token
+          sources: .
+          level: DEBUG
+          showProfiling: true
+      commands:
+          - export DRONE_BUILD_NUMBER="${DRONE_TAG:-${DRONE_BRANCH}}-${DRONE_COMMIT:0:7}"
+          - /bin/drone-sonar
+
+volumes:
+    - name: dockersock
+      host:
+          path: /var/run/docker.sock
