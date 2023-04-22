@@ -1,0 +1,473 @@
+basePath: /
+definitions:
+  domain.App:
+    properties:
+      app:
+        type: string
+    type: object
+  domain.ReqAuthJwtDecodeDTO:
+    properties:
+      accessToken:
+        type: string
+    type: object
+  domain.ReqCreateUserByTelephone:
+    properties:
+      nickname:
+        type: string
+      password:
+        type: string
+      telephone:
+        type: string
+      telephoneRegion:
+        type: string
+      username:
+        type: string
+    type: object
+  domain.ReqLoginAccountDTO:
+    properties:
+      account:
+        type: string
+      password:
+        type: string
+    required:
+    - account
+    - password
+    type: object
+  domain.ReqLoginTelephoneDTO:
+    properties:
+      password:
+        type: string
+      telephone:
+        type: string
+      telephoneRegion:
+        example: TW
+        type: string
+    required:
+    - password
+    - telephone
+    - telephoneRegion
+    type: object
+  domain.ReqRefreshAccessTokenDTO:
+    properties:
+      refreshToken:
+        type: string
+    type: object
+  domain.ReqSmsCaptchaSendDTO:
+    properties:
+      telephone:
+        description: 電話號碼
+        type: string
+      telephoneRegion:
+        description: 國家地區代碼
+        example: TW
+        type: string
+    required:
+    - telephone
+    - telephoneRegion
+    type: object
+  domain.ReqSmsCaptchaValidateDTO:
+    properties:
+      captcha:
+        description: 手機取得的驗證碼
+        type: string
+      identifier:
+        description: 識別碼
+        type: string
+      telephone:
+        description: 電話號碼
+        type: string
+      telephoneRegion:
+        description: 國家地區代碼
+        example: TW
+        type: string
+    required:
+    - captcha
+    - identifier
+    - telephone
+    - telephoneRegion
+    type: object
+  domain.ResLoginTokenDTO:
+    properties:
+      accessToken:
+        type: string
+      accessTokenExp:
+        type: integer
+      refreshToken:
+        type: string
+    type: object
+  domain.ResLogoutDTO:
+    properties:
+      count:
+        type: integer
+      isDelete:
+        type: boolean
+      message:
+        type: string
+    type: object
+  domain.ResSmsCaptchaSendDTO:
+    properties:
+      expiresTime:
+        description: 存在時長(秒)
+        type: integer
+      expiryDate:
+        description: 截止時間
+        type: string
+      identifier:
+        description: 辨識碼
+        type: string
+      telephone:
+        description: 電話號碼
+        type: string
+      telephoneRegion:
+        description: 國家地區代碼
+        example: TW
+        type: string
+    type: object
+  domain.ResSmsCaptchaValidateDTO:
+    properties:
+      accessToken:
+        type: string
+      accessTokenExp:
+        description: ExpiresAt   int64  `json"expiresAt,omitempty"`
+        type: integer
+      message:
+        description: 回傳訊息
+        type: string
+      process:
+        description: 回傳狀態
+        type: string
+    type: object
+  domain.ResponseError:
+    properties:
+      errorCode:
+        description: 自定義錯誤代碼
+        type: string
+      message:
+        description: 錯誤訊息
+        type: string
+      path:
+        description: API路徑
+        type: string
+      status:
+        description: 錯誤狀態碼
+        type: integer
+    type: object
+info:
+  contact: {}
+  description: Seeks Auth API
+  title: Seeks Auth Service
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: 取得App 名稱
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.App'
+      summary: 取得App 名稱
+      tags:
+      - app
+  /auth/jwt/decode:
+    post:
+      description: JwtDecode 解析jwt 內容
+      parameters:
+      - description: jwt
+        in: body
+        name: default
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ReqAuthJwtDecodeDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+        "400":
+          description: 請求的body、header驗證失敗
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+      summary: JwtDecode
+      tags:
+      - auth
+  /auth/jwt/verify:
+    get:
+      description: JwtVerify 驗證jwt，成功返回內容
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+        "400":
+          description: 請求的body、header驗證失敗
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: JwtVerify
+      tags:
+      - auth
+  /auth/jwt/verify-expired:
+    get:
+      description: JwtVerifyExpired 驗證過期jwt，成功返回內容
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+        "400":
+          description: 請求的body、header驗證失敗
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: JwtVerifyExpired
+      tags:
+      - auth
+  /auth/login/account:
+    post:
+      description: Auth Account Login
+      parameters:
+      - description: account login 內容
+        in: body
+        name: default
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ReqLoginAccountDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success login response
+          schema:
+            $ref: '#/definitions/domain.ResLoginTokenDTO'
+        "400":
+          description: 請求的body、header驗證失敗
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+      summary: Auth Account Login
+      tags:
+      - auth
+  /auth/login/telephone:
+    post:
+      description: Auth Telephone Login
+      parameters:
+      - description: telephone login 內容
+        in: body
+        name: default
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ReqLoginTelephoneDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success login response
+          schema:
+            $ref: '#/definitions/domain.ResLoginTokenDTO'
+        "400":
+          description: 請求的body、header驗證失敗
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+      summary: Auth Telephone Login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Auth 登出
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User has been successfully logout.
+          schema:
+            $ref: '#/definitions/domain.ResLogoutDTO'
+        "400":
+          description: 請求的body、header驗證失敗
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Auth 登出
+      tags:
+      - auth
+  /auth/refresh-access-token:
+    post:
+      description: 當access token失效時，拿refresh token來重新產生一組
+      parameters:
+      - description: telephone login 內容
+        in: body
+        name: default
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ReqRefreshAccessTokenDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success login response
+          schema:
+            $ref: '#/definitions/domain.ResLoginTokenDTO'
+        "400":
+          description: 請求的body、header驗證失敗
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: refresh token 產生token
+      tags:
+      - auth
+  /captcha/sms/send:
+    post:
+      description: Send Captcha SMS
+      parameters:
+      - description: Send Captcha SMS 內容
+        in: body
+        name: default
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ReqSmsCaptchaSendDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Send Captcha SMS 成功
+          schema:
+            $ref: '#/definitions/domain.ResSmsCaptchaSendDTO'
+        "400":
+          description: Send Captcha SMS 失敗
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+      summary: Send Captcha SMS
+      tags:
+      - captcha
+  /captcha/sms/validate:
+    post:
+      description: 驗證 Captcha SMS，不會檢查是否已經有使用者及電話號碼
+      parameters:
+      - description: 驗證 Captcha SMS 內容
+        in: body
+        name: default
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ReqSmsCaptchaValidateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 驗證 Captcha SMS 成功
+          schema:
+            $ref: '#/definitions/domain.ResSmsCaptchaValidateDTO'
+        "400":
+          description: 驗證 Captcha SMS 失敗
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+        "401":
+          description: 驗證 Captcha SMS 失敗
+          schema:
+            $ref: '#/definitions/domain.ResSmsCaptchaValidateDTO'
+      summary: 驗證 Captcha SMS
+      tags:
+      - captcha
+  /register/captcha/sms/send:
+    post:
+      description: 發送註冊的sms captcha
+      parameters:
+      - description: 發送的手機號碼
+        in: body
+        name: default
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ReqSmsCaptchaSendDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/domain.ResSmsCaptchaSendDTO'
+        "400":
+          description: 請求的body、header驗證失敗
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+      summary: send sms Register captcha
+      tags:
+      - register
+  /register/telephone/user:
+    post:
+      description: Register User By telephone
+      parameters:
+      - description: 建立
+        in: body
+        name: default
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ReqCreateUserByTelephone'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/domain.ResLoginTokenDTO'
+        "400":
+          description: 請求的body、header驗證失敗
+          schema:
+            $ref: '#/definitions/domain.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Register User By telephone
+      tags:
+      - register
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+  BasicAuth:
+    type: basic
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+  OAuth2AccessCode:
+    authorizationUrl: https://example.com/oauth/authorize
+    flow: accessCode
+    scopes:
+      admin: ' Grants read and write access to administrative information'
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+  OAuth2Application:
+    flow: application
+    scopes:
+      admin: ' Grants read and write access to administrative information'
+      write: ' Grants write access'
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+  OAuth2Implicit:
+    authorizationUrl: https://example.com/oauth/authorize
+    flow: implicit
+    scopes:
+      admin: ' Grants read and write access to administrative information'
+      write: ' Grants write access'
+    type: oauth2
+  OAuth2Password:
+    flow: password
+    scopes:
+      admin: ' Grants read and write access to administrative information'
+      read: ' Grants read access'
+      write: ' Grants write access'
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+swagger: "2.0"
+x-extension-openapi:
+  example: value on a json format
