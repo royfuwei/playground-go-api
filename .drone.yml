@@ -9,7 +9,6 @@ platform:
 steps:
     - name: unit test
       image: golang
-      failure: ignore
       commands:
           - go test ./...
 
