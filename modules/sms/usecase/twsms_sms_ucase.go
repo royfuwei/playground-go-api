@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"playground-go-api/config"
 	"playground-go-api/domain"
+	"strconv"
 
 	"github.com/golang/glog"
 )
@@ -81,7 +82,7 @@ func (ucase *twsmsSmsUsecase) SendMsgToTelephone(tel string, msg string) (*domai
 func (ucase *twsmsSmsUsecase) resSendMsgToTelDTO(twSmsSendApiRes domain.TwSmsSendApiRes) (*domain.SendMsgToTelDTO, error) {
 	result := &domain.SendMsgToTelDTO{
 		Message: twSmsSendApiRes.Text,
-		MsgId:   string(twSmsSendApiRes.MsgId),
+		MsgId:   strconv.Itoa(twSmsSendApiRes.MsgId),
 		Code:    twSmsSendApiRes.Code,
 	}
 	if twSmsSendApiRes.Code != "00000" {
